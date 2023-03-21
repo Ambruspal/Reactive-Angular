@@ -1,3 +1,4 @@
+import { MessagesService } from "./../messages/messages.service";
 import { LoadingService } from "./../loading/loading.service";
 import { CoursesService } from "./../services/courses.service";
 import { Component, OnInit } from "@angular/core";
@@ -27,7 +28,8 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private coursesService: CoursesService,
-    private loadingService: LoadingService
+    private loadingService: LoadingService,
+    private messagesService: MessagesService
   ) {}
 
   ngOnInit() {
@@ -38,7 +40,13 @@ export class HomeComponent implements OnInit {
     // this.loadingService.loadingOn();
 
     const courses$ = this.coursesService.loadAllCourses().pipe(
-      map((courses) => courses.sort(sortCoursesBySeqNo))
+      map((courses) => courses.sort(sortCoursesBySeqNo)),
+      catchError((error) => {
+        const message = "Could not load courses";
+        this.messagesService.showErrors(message);
+        console.log(message, error);
+        return throwError(error);
+      })
       // finalize(() => this.loadingService.loadingOff())
     );
 
