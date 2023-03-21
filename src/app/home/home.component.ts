@@ -35,23 +35,39 @@ export class HomeComponent implements OnInit {
   }
 
   loadCourses(): void {
-    this.loadingService.loadingOn();
+    // this.loadingService.loadingOn();
 
-    const courses = this.coursesService.loadAllCourses().pipe(
-      map((courses) => courses.sort(sortCoursesBySeqNo)),
-      finalize(() => this.loadingService.loadingOff())
+    const courses$ = this.coursesService.loadAllCourses().pipe(
+      map((courses) => courses.sort(sortCoursesBySeqNo))
+      // finalize(() => this.loadingService.loadingOff())
     );
 
-    this.beginnerCourses$ = courses.pipe(
+    // Olvashatobb és egysoros
+    const loadCourses$ = this.loadingService.showLoaderUntilCompleted(courses$);
+
+    this.beginnerCourses$ = loadCourses$.pipe(
       map((courses) =>
         courses.filter((course) => course.category === "BEGINNER")
       )
     );
 
-    this.advancedCourses$ = courses.pipe(
+    this.advancedCourses$ = loadCourses$.pipe(
       map((courses) =>
         courses.filter((course) => course.category === "ADVANCED")
       )
     );
   }
+
+  //   this.beginnerCourses$ = courses$.pipe(
+  //     map((courses) =>
+  //       courses.filter((course) => course.category === "BEGINNER")
+  //     )
+  //   );
+
+  //   this.advancedCourses$ = courses$.pipe(
+  //     map((courses) =>
+  //       courses.filter((course) => course.category === "ADVANCED")
+  //     )
+  //   );
+  // }
 }
