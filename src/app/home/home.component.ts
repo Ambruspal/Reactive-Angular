@@ -1,3 +1,4 @@
+import { LoadingService } from "./../loading/loading.service";
 import { CoursesService } from "./../services/courses.service";
 import { Component, OnInit } from "@angular/core";
 import { Course, sortCoursesBySeqNo } from "../model/course";
@@ -24,16 +25,22 @@ export class HomeComponent implements OnInit {
 
   advancedCourses$: Observable<Array<Course>>;
 
-  constructor(private coursesService: CoursesService) {}
+  constructor(
+    private coursesService: CoursesService,
+    private loadingService: LoadingService
+  ) {}
 
   ngOnInit() {
     this.loadCourses();
   }
 
   loadCourses(): void {
-    const courses = this.coursesService
-      .loadAllCourses()
-      .pipe(map((courses) => courses.sort(sortCoursesBySeqNo)));
+    this.loadingService.loadingOn();
+
+    const courses = this.coursesService.loadAllCourses().pipe(
+      map((courses) => courses.sort(sortCoursesBySeqNo)),
+      finalize(() => this.loadingService.loadingOff())
+    );
 
     this.beginnerCourses$ = courses.pipe(
       map((courses) =>

@@ -1,1 +1,3 @@
-
+<div class="spinner-container" *ngIf="loadingService.isLoading$ | async">
+  <mat-spinner></mat-spinner>
+</div>
